@@ -1,4 +1,3 @@
-//#include <string>   // for string
 #include <sstream>  // for stringstream
 #include <iomanip>  // for setw and setfill
 #include <iostream> // for cout
@@ -12,7 +11,7 @@ std::string hex2str(const std::string& h) {
     throw("Tried to string a non hex string");
   }
 
-  for(int i = 0; i < h.length(); i += 2) {
+  for(size_t i = 0; i < h.length(); i += 2) {
     int j = 0;
     std::stringstream ss(h.substr(i,2));
     ss >> std::hex >> j;
@@ -23,7 +22,7 @@ std::string hex2str(const std::string& h) {
 
 std::string xor_string(const std::string& plaintext, const std::string& key) {
   std::string x;
-  for(int i = 0; i < plaintext.length(); i++){
+  for(size_t i = 0; i < plaintext.length(); i++){
     x += (char) (plaintext[i] ^ key[i % key.length()]);
   }
   return x;
@@ -32,14 +31,14 @@ std::string xor_string(const std::string& plaintext, const std::string& key) {
 std::string str2hex(const std::string& s) {
   std::stringstream ss;
   ss << std::hex << std::setfill('0');
-  for (int i = 0; s.length() > i; ++i) {
+  for (size_t i = 0; s.length() > i; ++i) {
       ss << std::setw(2) << static_cast<unsigned int>(static_cast<unsigned char>(s[i]));
   }
   return ss.str();
 }
 
 bool allprintable(const std::string& s) {
-  for(int i = 0; i < s.length(); i++) {
+  for(size_t i = 0; i < s.length(); i++) {
     if(s[i] > 127) {
       return false; // anything non-ASCII
     }
@@ -49,7 +48,7 @@ bool allprintable(const std::string& s) {
 
 int score(const std::string& s) {
   int j = 0;
-  for(int i = 0; i < s.length(); i++) {
+  for(size_t i = 0; i < s.length(); i++) {
     int x = s[i];
     if ((x > 64 && x < 91) ||  // A-Z
         (x > 96 && x < 122) || // a-z
@@ -83,7 +82,7 @@ std::string crackxor(const std::string& s) {
 
 int countbits(const std::string& x) {
   int ham = 0;
-  for(int i = 0; i < x.length(); i++) {
+  for(size_t i = 0; i < x.length(); i++) {
     int c = x[i];
     ham += (0x80 & c) >> 7;
     ham += (0x40 & c) >> 6;
@@ -147,7 +146,7 @@ std::string initialiseiv(int size, bool randomise){
 bool ecbmatch(std::string hex){
 
   std::map <std::string,int> m;
-  for(int i = 0; i < hex.length(); i += 32){
+  for(size_t i = 0; i < hex.length(); i += 32){
     std::string chomp = (hex.substr(i, 32));
     if (m.count(chomp)) {
       return true;
@@ -169,7 +168,7 @@ std::string padrand(int min, int max){
 std::string encodev(const std::vector<std::string> v, const char join) {
   std::string s;
 
-  for(int i = 0; i < v.size(); i++) {
+  for(size_t i = 0; i < v.size(); i++) {
     if ( i > 0 ) {
       s += join;
     }

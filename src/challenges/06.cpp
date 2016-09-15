@@ -14,22 +14,22 @@ void challenge_06(){
   std::ifstream f("data/06.txt");
   std::string str((std::istreambuf_iterator<char>(f)),std::istreambuf_iterator<char>());
   std::string plain = b64decode(str);
-  int keylength = guesskeylength(plain, 40);
+  size_t keylength = guesskeylength(plain, 40);
 
   // initialise vector
   std::vector<std::string> v;
-  for(int i = 0; i < keylength; i++){
+  for(size_t i = 0; i < keylength; i++){
     v.push_back("");
   }
 
   // transpose into keylength chunks
-  for(int i = 0; i < plain.length(); i++) {
+  for(size_t i = 0; i < plain.length(); i++) {
     v[i % keylength] += plain[i];
   }
 
   // crack each chunk
   std::string key = "";
-  for(int i = 0; i < keylength; i++) {
+  for(size_t i = 0; i < keylength; i++) {
     std::string res = crackxor(v[i]);
     if ( res != "" ){
       key += res;

@@ -8,8 +8,8 @@ std::string b64encode(const std::string& s){
   int value;
 
   int leftovers  = s.length() % 3;
-  int length = s.length();
-  int i = 0;
+  size_t length = s.length();
+  size_t i = 0;
 
   // example
   // 11001101 10100110 00111001
@@ -64,8 +64,7 @@ std::string b64decode(const std::string& d) {
     throw("Tried to decode non base64 string");
   }
   int b[4];
-  int j = 0;
-  for(int i = 0; i < d.length(); i += 4){
+  for(size_t i = 0; i < d.length(); i += 4){
     b[0] = lut.find(d[i]);
     b[1] = lut.find(d[i+1]);
     b[2] = lut.find(d[i+2]);

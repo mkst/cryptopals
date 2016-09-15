@@ -1,3 +1,5 @@
+#pragma once
+
 void challenge_01();
 void challenge_02();
 void challenge_03();

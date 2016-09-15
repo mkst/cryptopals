@@ -38,12 +38,12 @@ void challenge_17(){
   // vector to put ciphertext in
   std::vector<std::string> v;
 
-  for(int i = 0; i < encrypted.length(); i += KEY_LENGTH) {
+  for(size_t i = 0; i < encrypted.length(); i += KEY_LENGTH) {
     v.push_back(encrypted.substr(i, KEY_LENGTH));
   }
 
   std::string cracked = crack_aes_cbc(iv, key, iv, v[0]); // use IV for first block, we could guess this
-  for(int i = 0; i < v.size() - 1; i++) {
+  for(size_t i = 0; i < v.size() - 1; i++) {
     cracked += crack_aes_cbc(iv, key, v[i], v[i+1]);
   }
 

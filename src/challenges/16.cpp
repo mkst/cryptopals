@@ -25,7 +25,7 @@ void challenge_16() {
 
   std::vector<std::string> v;
 
-  for(int i = 0; i < encrypted.length(); i += KEY_LENGTH) {
+  for(size_t i = 0; i < encrypted.length(); i += KEY_LENGTH) {
     v.push_back(encrypted.substr(i, KEY_LENGTH));
   }
 
@@ -35,13 +35,13 @@ void challenge_16() {
   v[2][11] = ';' ^ (char)v[2][11] ^ PADDING;
 
   std::string bitflipped;
-  for(int i = 0; i < v.size(); i++) {
+  for(size_t i = 0; i < v.size(); i++) {
     bitflipped += v[i];
   }
 
   std::vector<std::string> pairs = explode(decrypt_aes_cbc(iv, key, bitflipped, true), ';');
 
-  for(int i = 0; i < pairs.size(); i++) {
+  for(size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i] == "admin=true") {
       std::cout << "WE ARE ADMIN!" << std::endl;
     }

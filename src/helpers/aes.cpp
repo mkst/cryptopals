@@ -13,13 +13,13 @@ using CryptoPP::StreamTransformationFilter;
 #include "utils.h"
 
 bool validpadding(const std::string& s) {
-  int i = (int)s[s.length() - 1];
+  size_t i = (int)s[s.length() - 1];
 
   if (0 < i && i <= s.length()) { // sanity
     std::string sub = s.substr(s.length() - i, i);
 
-    for(int j = 0; j < sub.length(); j++){
-      if(sub[j] != i) {
+    for(size_t j = 0; j < sub.length(); j++){
+      if((size_t)sub[j] != i) {
         return false;
       }
     }
@@ -30,7 +30,7 @@ bool validpadding(const std::string& s) {
 
 std::string removepadding(const std::string& s) {
 
-  int i = (int)s[s.length() - 1];
+  size_t i = (int)s[s.length() - 1];
 
   if (validpadding(s)) {
     return s.substr(0, (s.length() - i));
@@ -111,7 +111,7 @@ std::string encrypt_aes_cbc(const std::string& iv, const std::string& key, const
   std::string encrypted;
   std::string IV = iv;
 
-  for(int i = 0; i < padded.length() ; i += 16) {
+  for(size_t i = 0; i < padded.length() ; i += 16) {
     std::string e = encrypt_aes_cbc_block(IV, key, padded.substr(i, 16));
     IV = e;
     encrypted += e;
@@ -122,7 +122,7 @@ std::string encrypt_aes_cbc(const std::string& iv, const std::string& key, const
 std::string decrypt_aes_cbc(const std::string& iv, const std::string& key, const std::string& cipher, const bool removepad) {
   std::string decrypted;
   std::string IV = iv;
-  for(int i = 0; i < cipher.length(); i += 16) {
+  for(size_t i = 0; i < cipher.length(); i += 16) {
     std::string d = decrypt_aes_cbc_block(IV, key, cipher.substr(i,16));
     IV = cipher.substr(i,16);
     decrypted += d;
@@ -150,7 +150,6 @@ std::string crack_aes_cbc(const std::string& iv, const std::string& key, const s
       // now fill in the rest of the string
       for(int k = 0; k < pos - 1; k++) {
         char c = cipher[KEY_LENGTH - k - 1];      // e.g. cipher[14]
-        char p = pos;                             // the padding we want (e.g. 0x01)
         char g = found[k];                        // previously good value
         cipher[KEY_LENGTH - k - 1] = c ^ pos ^ g; // xor them together with pos (the padding we want!)
       }
