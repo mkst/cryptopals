@@ -6,40 +6,38 @@
 #include "utils.h"
 #include "aes.h"
 
+static const size_t AES_KEY_LENGTH = 16;
+
 void challenge_16() {
 
-  const int KEY_LENGTH = 16;
   const char PADDING = '-';
 
-  std::string pre = "comment1=cooking%20MCs;userdata=";
-  std::string after = ";comment2=%20like%20a%20pound%20of%20bacon";
+  std::string s1 = "ZaphodBeeblebrox"; // key
 
-  std::string input = "XXXXXXXXXXXXXXXX" // this will be mashed
+  std::string pre = "comment1=cooking%20MCs;userdata=";
+  std::string post = ";comment2=%20like%20a%20pound%20of%20bacon";
+
+  std::string input = "XXXXXXXXXXXXXXXX" // this will be corrupted
                       "-admin-true-XXXX" // this will be bitflipped
                       "XXXXXX";          // this is just padding
 
-  std::string iv = initialiseiv(KEY_LENGTH, true);
-  std::string key = "ZaphodBeeblebrox";
+  std::string attack = pre + regex_replace(input, std::regex(";|="), "") + post;
 
-  std::string encrypted = encrypt_aes_cbc(iv, key, pre + regex_replace(input, std::regex(";|="), "") + after);
+  std::vector<uint8_t> iv = initialiseiv(AES_KEY_LENGTH, false);
+  std::vector<uint8_t> key(s1.begin(), s1.end());
 
-  std::vector<std::string> v;
+  std::vector<uint8_t> encrypted = encrypt_aes_cbc(iv, key, std::vector<uint8_t>(attack.begin(), attack.end()));
 
-  for(size_t i = 0; i < encrypted.length(); i += KEY_LENGTH) {
-    v.push_back(encrypted.substr(i, KEY_LENGTH));
-  }
+  // XXXXXXXXXXXXXXXX
+  // -admin-true-XXXX
+  // ^     ^    ^
+  // do the bit flip on bytes 0, 6 and 11
+  encrypted[2*AES_KEY_LENGTH] = (';' ^ encrypted[2*AES_KEY_LENGTH] ^ PADDING);
+  encrypted[2*AES_KEY_LENGTH + 6] = ('=' ^ encrypted[2*AES_KEY_LENGTH + 6] ^ PADDING);
+  encrypted[2*AES_KEY_LENGTH + 11] = (';' ^ encrypted[2*AES_KEY_LENGTH + 11] ^ PADDING);
 
-  // flip the bits of "-admin-true-XXXX" to what we want
-  v[2][0] = ';' ^ (char)v[2][0] ^ PADDING;
-  v[2][6] = '=' ^ (char)v[2][6] ^ PADDING;
-  v[2][11] = ';' ^ (char)v[2][11] ^ PADDING;
-
-  std::string bitflipped;
-  for(size_t i = 0; i < v.size(); i++) {
-    bitflipped += v[i];
-  }
-
-  std::vector<std::string> pairs = explode(decrypt_aes_cbc(iv, key, bitflipped, true), ';');
+  // now to decrypt and check the result
+  std::vector<std::string> pairs = explode(v2str(decrypt_aes_cbc(iv, key, encrypted, true)), ';');
 
   for(size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i] == "admin=true") {

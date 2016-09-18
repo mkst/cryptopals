@@ -1,15 +1,14 @@
 #pragma once
 
-std::string decrypt_aes_ecb(const std::string& key, const std::string& cipher);
-std::string encrypt_aes_ecb(const std::string& key, const std::string& plaintext);
+#include <vector>
 
-std::string encrypt_aes_cbc_block(const std::string& iv, const std::string& key, const std::string& block);
-std::string decrypt_aes_cbc_block(const std::string& iv, const std::string& key, const std::string& block);
+std::vector<uint8_t> decrypt_aes_ecb(const std::vector<uint8_t>& key, const std::vector<uint8_t>& cipher);
+std::vector<uint8_t> encrypt_aes_ecb(const std::vector<uint8_t>& key, const std::vector<uint8_t>& plaintext);
 
-std::string decrypt_aes_cbc(const std::string& iv, const std::string& key, const std::string& cipher, const bool removepad);
-std::string encrypt_aes_cbc(const std::string& iv, const std::string& key, const std::string& plaintext);
+std::vector<uint8_t> decrypt_aes_cbc(const std::vector<uint8_t>& iv, const std::vector<uint8_t>& key, const std::vector<uint8_t>& cipher, const bool removepad);
+std::vector<uint8_t> encrypt_aes_cbc(const std::vector<uint8_t>& iv, const std::vector<uint8_t>& key, const std::vector<uint8_t>& plaintext);
 
-std::string crack_aes_cbc(const std::string& iv, const std::string& key, const std::string& cipher1, const std::string& cipher2);
+std::vector<uint8_t> crack_aes_cbc(const std::vector<uint8_t>& iv, const std::vector<uint8_t>& key, const std::vector<uint8_t>& cipher1, const std::vector<uint8_t>& cipher2);
 
-bool validpadding(const std::string& s);
-std::string removepadding(const std::string& s);
+bool validpadding(const std::vector<uint8_t>& v);
+std::vector<uint8_t> removepadding(const std::vector<uint8_t>& v);

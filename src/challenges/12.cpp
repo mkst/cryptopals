@@ -1,53 +1,67 @@
 #include <string>
 #include <iostream>
 
+#include <cassert>
+
 #include "utils.h"
 #include "base64.h"
 #include "aes.h"
 
 void challenge_12(){
-  std::string key = hex2str("fd0676d8a07bac258e52f886f5158add");
 
-  std::string cipher = b64decode("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK");
+  std::string s1 = "fd0676d8a07bac258e52f886f5158add";
+  std::string s2 = "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK";
+
+  std::vector<uint8_t> key = hex2v(std::vector<uint8_t>(s1.begin(), s1.end()));
+
+  std::vector<uint8_t> cipher = b64decode(std::vector<uint8_t>(s2.begin(), s2.end()));
 
   // 1
-  size_t keylength = encrypt_aes_ecb(key, "a").length();
+  size_t keylength = encrypt_aes_ecb(key, std::vector<uint8_t>({'a'})).size();
 
   // 2
-  bool isECB = ecbmatch(encrypt_aes_ecb(key, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+  std::string aaa = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  assert(ecbmatch(encrypt_aes_ecb(key, std::vector<uint8_t>(aaa.begin(), aaa.end()))));
 
   // 3
+  std::vector<uint8_t> decrypted;
 
-  if(isECB) {
-    std::string decrypted;
+  for(size_t z = 0; z < cipher.size(); z += keylength) {
 
-    for(size_t z = 0; z < cipher.length(); z += keylength) {
+    std::vector<uint8_t> cipherblock = std::vector<uint8_t>(&cipher[z], &cipher[z+keylength]);
+    std::vector<uint8_t> known;
 
-      std::string cipherblock = cipher.substr(z, keylength);
-      std::string known;
+    for(size_t j = keylength; j > 0; j--) {
+      std::vector<uint8_t> padding;
 
-      for(size_t j = keylength; j > 0; j--) {
-        std::string padding;
+      for(size_t i = 0; i < (j - 1); i++){
+        padding.push_back('A');
+      }
 
-        for(size_t i = 0; i < (j - 1); i++){
-          padding += "A";
-        }
+      std::vector<uint8_t> p = padding;
+      p.insert(p.end(), cipherblock.begin(), cipherblock.end());
+      std::vector<uint8_t> encrypted = encrypt_aes_ecb(key, p);
 
-        for(int i = 1; i < 127; i++) { // why cant we start at 0x00?
-          std::string encrypted = encrypt_aes_ecb(key, padding + cipherblock);
-          std::string padded    = encrypt_aes_ecb(key, padding + known + std::string(1, (char)i));
+      // we only care about the first block
+      encrypted = std::vector<uint8_t>(encrypted.begin(), encrypted.begin() + keylength);
 
-          if(encrypted.substr(0,keylength) == padded.substr(0,keylength)) {
-            known += (char)i;
-            break;
-          }
+      for(int i = 0; i < 256; i++) {
+        // guess plaintext
+        p = padding;
+        p.insert(p.end(), known.begin(), known.end());
+        p.push_back(i);
+
+        std::vector<uint8_t> padded(encrypt_aes_ecb(key, p));
+
+        padded = std::vector<uint8_t>(padded.begin(), padded.begin() + keylength);
+
+        if(encrypted  == padded) {
+          known.push_back(i);
+          break;
         }
       }
-    decrypted += known;
     }
-    std::cout << removepadding(decrypted) << std::endl;
-    std::cout << cipher << std::endl;
-  } else {
-    std::cout << "didnt think it was ECB :(";
+  decrypted.insert(decrypted.end(), known.begin(), known.end());
   }
+  std::cout << v2str(removepadding(decrypted)) << std::endl;
 }

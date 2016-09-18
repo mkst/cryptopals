@@ -2,45 +2,38 @@
 #include <iostream>
 #include <fstream>
 
+#include <cassert>
+
 #include "utils.h"
 #include "base64.h"
 
 void challenge_06(){
 
-  //std::string a = "this is a test";
-  //std::string b = "wokka wokka!!!";
-  //std::cout << "ham distance:\t" << getham(a, b) << std::endl;
-
   std::ifstream f("data/06.txt");
-  std::string str((std::istreambuf_iterator<char>(f)),std::istreambuf_iterator<char>());
-  std::string plain = b64decode(str);
-  size_t keylength = guesskeylength(plain, 40);
+  std::string s1((std::istreambuf_iterator<char>(f)),std::istreambuf_iterator<char>());
 
-  // initialise vector
-  std::vector<std::string> v;
-  for(size_t i = 0; i < keylength; i++){
-    v.push_back("");
-  }
+  std::vector<uint8_t> v1(s1.begin(), s1.end()); // TODO: stream straight into the vector
+  std::vector<uint8_t> v2 = b64decode(v1);
+
+  // guess the key length
+  size_t keylength = guesskeylength(v2, 40);
 
   // transpose into keylength chunks
-  for(size_t i = 0; i < plain.length(); i++) {
-    v[i % keylength] += plain[i];
+  std::vector<std::vector<uint8_t>> v3(keylength);
+  for (size_t i = 0; i < v2.size(); i++) {
+    v3[i % keylength].push_back(v2[i]);
   }
 
   // crack each chunk
-  std::string key = "";
-  for(size_t i = 0; i < keylength; i++) {
-    std::string res = crackxor(v[i]);
-    if ( res != "" ){
-      key += res;
+  std::vector<uint8_t> key;
+  for (size_t i = 0; i < keylength; i++) {
+    std::vector<uint8_t> res = crackxor(v3[i]);
+    if (res.size() > 0) {
+      key.push_back(res[0]); // add cracked key to full key
     }
    }
 
-  if(key.length() != keylength) {
-    throw("Failed to decode...");
-  }
+  assert(key.size() == keylength);
 
-  std::cout << "keylength:\t " << keylength << std::endl;
-  std::cout << "key:\t" << key << std::endl;
-  std::cout << "cracked:\t" << xor_string(plain, key) << std::endl;
+  std::cout << v2str(xor_vector(v2, key)) << std::endl;
 }

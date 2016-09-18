@@ -8,6 +8,7 @@ int main() {
   challenge_03();
   challenge_04();
   challenge_05();
+
   challenge_06();
   challenge_07();
   challenge_08();
@@ -18,12 +19,15 @@ int main() {
   challenge_11();
   challenge_12();
   challenge_13();
-  challenge_15();
   // challenge_14(); TODO
+
+  challenge_15();
   challenge_16();
 
   // set 3
   challenge_17();
+
+  // challenge_18();
 
   return 0;
 }

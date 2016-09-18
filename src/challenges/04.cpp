@@ -1,26 +1,28 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include "utils.h"
 
 void challenge_04(){
   std::ifstream infile("data/04.txt");
+
+  std::vector<uint8_t> key;
+  std::vector<uint8_t> cipher;
+
   std::string line;
-  std::string key;
-  std::string cipher;
 
   while (std::getline(infile, line)) {
-    cipher = hex2str(line);
+
+    std::vector<uint8_t> v(line.begin(), line.end());
+
+    cipher = hex2v(v);
     key = crackxor(cipher);
     if(!key.empty()) {
       break;
     }
   }
 
-  std::string plain = xor_string(cipher, key);
-
-  std::cout << "key:\t" << str2hex(key) << std::endl;
-  std::cout << "hex:\t" << str2hex(plain) << std::endl;
-  std::cout << "plain:\t" << plain << std::endl;
+  std::cout << v2str(xor_vector(cipher, key)) << std::endl;
 }

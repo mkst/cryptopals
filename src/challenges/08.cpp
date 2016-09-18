@@ -7,16 +7,14 @@
 void challenge_08(){
   std::ifstream infile("data/08.txt");
   std::string line;
-  std::string res;
 
   while (std::getline(infile, line)) {
-    if(ecbmatch(line)) {
-      res = line;
+    std::vector<uint8_t> v1(line.begin(), line.end());
+    std::vector<uint8_t> v2 = hex2v(v1);
+
+    if(ecbmatch(v2)) {
+      std::cout << line << std::endl; // lazy
       break;
     }
-  }
-  if(!res.empty()){
-    // TODO: crack this one?
-    std::cout << "found:\t" << res << std::endl;
   }
 }

@@ -3,6 +3,7 @@
 #include <iostream> // for cout
 #include <map>
 #include <random>
+#include <vector>
 
 std::string hex2str(const std::string& h) {
   std::string s;
@@ -20,12 +21,41 @@ std::string hex2str(const std::string& h) {
   return s;
 }
 
-std::string xor_string(const std::string& plaintext, const std::string& key) {
-  std::string x;
-  for(size_t i = 0; i < plaintext.length(); i++){
-    x += (char) (plaintext[i] ^ key[i % key.length()]);
+std::string v2str(const std::vector<uint8_t>& v) {
+  std::string s;
+  for(size_t i = 0; i < v.size(); i++) {
+    s += v[i];
   }
-  return x;
+  return s;
+}
+
+std::vector<uint8_t> hex2v(const std::vector<uint8_t>& h) {
+  std::vector<uint8_t> v;
+
+  if(h.size() & 1) {
+    throw("Tried to string a non hex string");
+  }
+
+  for(size_t i = 0; i < h.size(); i += 2) {
+    int j = 0;
+    std::string s(1, h[i]);  // there must be a better way to do this?!
+    s += h[i+1];
+    std::stringstream ss(s);
+    ss >> std::hex >> j;
+    v.push_back((uint8_t)j);
+  }
+  return v;
+}
+
+std::vector<uint8_t> xor_vector(const std::vector<uint8_t>& v1, const std::vector<uint8_t>& v2) {
+
+  std::vector<uint8_t> v;
+
+  for(size_t i = 0; i < v1.size(); i++) {
+    v.push_back(v1[i] ^ v2[i % v2.size()]);
+  }
+
+  return v;
 }
 
 std::string str2hex(const std::string& s) {
@@ -37,19 +67,28 @@ std::string str2hex(const std::string& s) {
   return ss.str();
 }
 
-bool allprintable(const std::string& s) {
-  for(size_t i = 0; i < s.length(); i++) {
-    if(s[i] > 127) {
+std::string v2hex(const std::vector<uint8_t>& v) {
+  std::stringstream ss;
+  ss << std::hex << std::setfill('0');
+  for (size_t i = 0; v.size() > i; ++i) {
+      ss << std::setw(2) << static_cast<unsigned int>(v[i]); // cast to int to avoid char
+  }
+  return ss.str();
+}
+
+bool allprintable(const std::vector<uint8_t>& v) {
+  for(size_t i = 0; i < v.size(); i++) {
+    if(v[i] > 127) {
       return false; // anything non-ASCII
     }
   }
   return true;
 }
 
-int score(const std::string& s) {
+int score(const std::vector<uint8_t>& v) {
   int j = 0;
-  for(size_t i = 0; i < s.length(); i++) {
-    int x = s[i];
+  for(size_t i = 0; i < v.size(); i++) {
+    int x = v[i];
     if ((x > 64 && x < 91) ||  // A-Z
         (x > 96 && x < 122) || // a-z
         (x > 47 && x < 58)) {  // 0-9
@@ -60,18 +99,17 @@ int score(const std::string& s) {
       j -= 1; // punishment
     }
   }
-
   return j;
 }
-std::string crackxor(const std::string& s) {
 
-  std::string key;
+std::vector<uint8_t> crackxor(const std::vector<uint8_t>& v) { // TODO: return char?
+  std::vector<uint8_t> key;
 
-  for(char c = 0; c < 127; c++) { // assume only ASCII
-    std::string k = std::string(1, c); // cast char to string
-    std::string res = xor_string(s, k);
-    if(allprintable(res)) { // only printable ascii
-      if (score(res) > res.length() * 0.9) { // 90% in 'A-Za-z0-9 '
+  for(uint8_t c = 0; c < 127; c++) {
+    std::vector<uint8_t> k({c});
+    std::vector<uint8_t> res = xor_vector(v, k);
+    if(allprintable(res)) { // only printable ASCII
+      if (score(res) > res.size() * 0.9) { // 90% in 'A-Za-z0-9 '
         key = k;
         break;
       }
@@ -80,10 +118,10 @@ std::string crackxor(const std::string& s) {
   return key;
 }
 
-int countbits(const std::string& x) {
+int countbits(const std::vector<uint8_t>& v) {
   int ham = 0;
-  for(size_t i = 0; i < x.length(); i++) {
-    int c = x[i];
+  for(size_t i = 0; i < v.size(); i++) {
+    int c = v[i];
     ham += (0x80 & c) >> 7;
     ham += (0x40 & c) >> 6;
     ham += (0x20 & c) >> 5;
@@ -94,24 +132,24 @@ int countbits(const std::string& x) {
     ham += (0x01 & c);
   }
   return ham;
-  }
-
-int getham(const std::string& a, const std::string& b){
-  return countbits(xor_string(a, b));
 }
 
-int guesskeylength(const std::string& s, int maxlength){
+int getham(const std::vector<uint8_t>& v1, const std::vector<uint8_t>& v2) {
+  return countbits(xor_vector(v1, v2));
+}
+
+int guesskeylength(const std::vector<uint8_t>& v, int maxlength) {
   float mindist = 255; // enough?
   int keylength = 0;
 
-  for (int i = 2; i < maxlength; i++) {
+  for (int i = 1; i < maxlength; i++) { // key length > 0
     float ham = 0.0;
     int offset = 64;
     int offsets = 16;
     for(int j = 0; j < (offset * offsets); j += offset) {
-      std::string a = s.substr(j, i);
-      std::string b = s.substr(j + i, i);
-      ham += getham(a, b) / (float)i;
+      std::vector<uint8_t> v1(&v[j],&v[j + i]);
+      std::vector<uint8_t> v2(&v[j + i],&v[j + 2*i]);
+      ham += getham(v1, v2) / (float)i;
     }
     if ((ham / offsets) < mindist) {
       mindist = ham / offsets;
@@ -121,33 +159,38 @@ int guesskeylength(const std::string& s, int maxlength){
   return keylength;
 }
 
-std::string padme(const std::string& s, int length){
-  char pad = length - s.length();
-  std::string padding;
+std::vector<uint8_t> padme(const std::vector<uint8_t>& v, int length){
+  uint8_t pad = length - v.size();
+  std::vector<uint8_t> padding = v;
+
   for(int i = 0; i < pad; i++) {
-    padding += pad;
+    padding.push_back(pad);
   }
-  return s + padding;
+
+  return padding;
 }
 
-std::string initialiseiv(int size, bool randomise){
-  std::string iv;
+std::vector<uint8_t> initialiseiv(uint8_t length, bool randomise){
+  std::vector<uint8_t> iv;
 
   std::random_device rd;
   std::mt19937 mt(rd());
-  std::uniform_real_distribution<double> dist(0, 128);
+  std::uniform_real_distribution<double> dist(0, 127); // can we go up to 256 now?
 
-  for(int i = 0; i < size; i++){
-    iv += (char) randomise ? dist(mt): 0;
+  for(uint8_t i = 0; i < length; i++){
+    iv.push_back(randomise ? uint8_t(dist(mt)): 0);
   }
   return iv;
 }
 
-bool ecbmatch(std::string hex){
+bool ecbmatch(std::vector<uint8_t> v){
 
-  std::map <std::string,int> m;
-  for(size_t i = 0; i < hex.length(); i += 32){
-    std::string chomp = (hex.substr(i, 32));
+  const size_t KEY_LENGTH = 16;
+
+  std::map <std::vector<uint8_t>, int> m;
+
+  for(size_t i = 0; i < v.size(); i += KEY_LENGTH){
+    std::vector<uint8_t> chomp = std::vector<uint8_t>(&v[i], &v[i+KEY_LENGTH]);
     if (m.count(chomp)) {
       return true;
     } else {
@@ -157,7 +200,7 @@ bool ecbmatch(std::string hex){
   return false;
 }
 
-std::string padrand(int min, int max){
+std::vector<uint8_t> padrand(int min, int max) {
   std::random_device rd;
   std::mt19937 mt(rd());
   std::uniform_real_distribution<double> dist(min, max);

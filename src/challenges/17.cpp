@@ -23,8 +23,10 @@ void challenge_17(){
   plaintexts.push_back(b64decode("MDAwMDA4b2xsaW4nIGluIG15IGZpdmUgcG9pbnQgb2g="));
   plaintexts.push_back(b64decode("MDAwMDA5aXRoIG15IHJhZy10b3AgZG93biBzbyBteSBoYWlyIGNhbiBibG93"));
 
-  std::string iv = initialiseiv(KEY_LENGTH, true);
-  std::string key = "ZaphodBeeblebrox";
+  std::vector<uint8_t> iv = initialiseiv(KEY_LENGTH, true);
+  std::string s1 = "ZaphodBeeblebrox";
+
+  std::vector<uint8_t> key(s1.begin(), s1.end());
 
   // seed the random generator
   std::random_device rd;
@@ -33,22 +35,20 @@ void challenge_17(){
 
   // pick a random plaintext to encrypt
   int random = dist(mt);
-  std::string encrypted = encrypt_aes_cbc(iv, key, plaintexts[random]);
+  std::string plaintext = plaintexts[random];
 
-  // vector to put ciphertext in
-  std::vector<std::string> v;
+  // then encrypt it
+  std::vector<uint8_t> encrypted = encrypt_aes_cbc(iv, key, std::vector<uint8_t>(plaintext.begin(), plaintext.end()));
 
-  for(size_t i = 0; i < encrypted.length(); i += KEY_LENGTH) {
-    v.push_back(encrypted.substr(i, KEY_LENGTH));
+  // use IV for first block, we could guess this
+  std::vector<uint8_t> cracked = crack_aes_cbc(iv, key, iv, std::vector<uint8_t>(encrypted.begin(), encrypted.begin() + KEY_LENGTH));
+
+  // work through the blocks and crack each pair
+  for(size_t i = 0; i < encrypted.size() - KEY_LENGTH; i += KEY_LENGTH) {
+    std::vector<uint8_t> c = crack_aes_cbc(iv, key, std::vector<uint8_t>(encrypted.begin() + i, encrypted.begin() + i + KEY_LENGTH),
+                                      std::vector<uint8_t>(encrypted.begin() + i + KEY_LENGTH, encrypted.begin() + i + 2*KEY_LENGTH));
+    cracked.insert(cracked.end(), c.begin(), c.end());
   }
 
-  std::string cracked = crack_aes_cbc(iv, key, iv, v[0]); // use IV for first block, we could guess this
-  for(size_t i = 0; i < v.size() - 1; i++) {
-    cracked += crack_aes_cbc(iv, key, v[i], v[i+1]);
-  }
-
-  std::cout << "cracked:\t" << str2hex(cracked) << std::endl;
-  std::cout << "unhexed:\t" << removepadding(cracked) << std::endl;
-  std::cout << "decrypt:\t" << str2hex(decrypt_aes_cbc(iv, key, encrypted, false)) << std::endl;
-  std::cout << "original:\t" << plaintexts[random] << std::endl;
+  std::cout << v2str(removepadding(cracked)) << std::endl;
 }
