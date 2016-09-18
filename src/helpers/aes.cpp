@@ -212,7 +212,7 @@ std::vector<uint8_t> decrypt_aes_ctr(const std::vector<uint8_t>& key, const std:
 
     std::vector<uint8_t> x = xor_vector(c, std::vector<uint8_t>(e.begin(), e.begin() + AES_KEY_LENGTH)); // ignore 16 bytes of padding
 
-    decrypted.insert(decrypted.end(), x.begin(), x.begin() + c.size());
+    decrypted.insert(decrypted.end(), x.begin(), x.begin() + chunksize);
 
     // increment stream counter
     ctr++;
@@ -227,18 +227,19 @@ std::vector<uint8_t> encrypt_aes_ctr(const std::vector<uint8_t>& key, const std:
 
   div_t d = div(plaintext.size(),16);
 
-  for (int i = 0; i <= d.quot; i++) {
+  for (int i = 0; i < d.quot; i++) {
 
-    size_t chunksize = AES_KEY_LENGTH;
-    if(i + 1 > d.quot && d.rem > 0) {
-      // final chunk is smaller than 16 bytes
-      chunksize = d.rem;
-    }
     std::vector<uint8_t> e = encrypt_aes_ecb(key, keystream(nonce, ctr));
-    encrypted.insert(encrypted.end(), e.begin(), e.begin() + chunksize);
+    encrypted.insert(encrypted.end(), e.begin(), e.begin() + AES_KEY_LENGTH);
 
     // increment stream counter
     ctr++;
+  }
+
+  // add any remaing chunk
+  if(d.rem > 0) {
+    std::vector<uint8_t> e = encrypt_aes_ecb(key, keystream(nonce, ctr));
+    encrypted.insert(encrypted.end(), e.begin(), e.begin() + d.rem);
   }
 
   return xor_vector(encrypted, plaintext);
