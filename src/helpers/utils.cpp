@@ -170,6 +170,17 @@ std::vector<uint8_t> padme(const std::vector<uint8_t>& v, int length){
   return padding;
 }
 
+std::vector<uint8_t> padzero(const std::vector<uint8_t> str, const int length) {
+
+  std::vector<uint8_t> p = str;
+
+  for(size_t i = 0; i < length - str.size(); i++) {
+    p.push_back(0);
+  }
+
+  return p;
+}
+
 std::vector<uint8_t> initialiseiv(uint8_t length, bool randomise){
   std::vector<uint8_t> iv;
 

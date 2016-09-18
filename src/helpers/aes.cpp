@@ -174,3 +174,72 @@ std::vector<uint8_t> crack_aes_cbc(const std::vector<uint8_t>& iv, const std::ve
   std::reverse(found.begin(), found.end()); // flip
   return found;
 }
+
+std::vector<uint8_t> keystream(const std::vector<uint8_t>& nonce, const int counter) {
+
+  std::vector<uint8_t> n = nonce;
+
+  int i = counter;
+
+  if(counter > 4294967295) {
+    throw ("We are going to overflow!");
+  }
+
+  while(i>0) {
+    div_t d = div(i,16);
+    i = d.quot;
+    n.push_back(d.rem);
+  }
+  return padzero(n, AES_KEY_LENGTH);
+}
+
+std::vector<uint8_t> decrypt_aes_ctr(const std::vector<uint8_t>& key, const std::vector<uint8_t>& cipher, const std::vector<uint8_t>& nonce, const int counter) {
+
+  std::vector<uint8_t> decrypted;
+
+  int ctr = counter;
+
+  for (size_t i = 0; i < cipher.size(); i += AES_KEY_LENGTH) {
+
+    size_t chunksize = AES_KEY_LENGTH;
+
+    if(i+AES_KEY_LENGTH > cipher.size()){
+      // we are at the final chunk
+      chunksize = cipher.size() % AES_KEY_LENGTH;
+    }
+    std::vector<uint8_t> e = encrypt_aes_ecb(key, keystream(nonce, ctr));
+    std::vector<uint8_t> c = std::vector<uint8_t>(cipher.begin() + i, cipher.begin() + i + chunksize);
+
+    std::vector<uint8_t> x = xor_vector(c, std::vector<uint8_t>(e.begin(), e.begin() + AES_KEY_LENGTH)); // ignore 16 bytes of padding
+
+    decrypted.insert(decrypted.end(), x.begin(), x.begin() + c.size());
+
+    // increment stream counter
+    ctr++;
+  }
+
+  return decrypted;
+}
+std::vector<uint8_t> encrypt_aes_ctr(const std::vector<uint8_t>& key, const std::vector<uint8_t>& plaintext, const std::vector<uint8_t>& nonce, const int counter) {
+
+  std::vector<uint8_t> encrypted;
+  int ctr = counter;
+
+  div_t d = div(plaintext.size(),16);
+
+  for (int i = 0; i <= d.quot; i++) {
+
+    size_t chunksize = AES_KEY_LENGTH;
+    if(i + 1 > d.quot && d.rem > 0) {
+      // final chunk is smaller than 16 bytes
+      chunksize = d.rem;
+    }
+    std::vector<uint8_t> e = encrypt_aes_ecb(key, keystream(nonce, ctr));
+    encrypted.insert(encrypted.end(), e.begin(), e.begin() + chunksize);
+
+    // increment stream counter
+    ctr++;
+  }
+
+  return xor_vector(encrypted, plaintext);
+}

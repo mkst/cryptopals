@@ -23,7 +23,7 @@ My attempt to solve the cryptopals challenges...
 
 ## Set 3: Block & stream crypto
 17. [Y] The CBC padding oracle
-18. [N] Implement CTR, the stream cipher mode
+18. [Y] Implement CTR, the stream cipher mode
 19. [N] Break fixed-nonce CTR mode using substitutions
 20. [N] Break fixed-nonce CTR statistically
 21. [N] Implement the MT19937 Mersenne Twister RNG
@@ -35,3 +35,4 @@ My attempt to solve the cryptopals challenges...
 
 Dependencies:
  - libcrypto++ (https://www.cryptopp.com/)
+ - compiler with c++11 support
