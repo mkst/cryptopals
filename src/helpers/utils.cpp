@@ -105,8 +105,8 @@ int score(const std::vector<uint8_t>& v) {
 std::vector<uint8_t> crackxor(const std::vector<uint8_t>& v) { // TODO: return char?
   std::vector<uint8_t> key;
 
-  for(uint8_t c = 0; c < 127; c++) {
-    std::vector<uint8_t> k({c});
+  for(uint16_t c = 0; c < 256; c++) { // use 16bits to prevent overflow
+    std::vector<uint8_t> k({(uint8_t)c}); // avoid narrowing warning
     std::vector<uint8_t> res = xor_vector(v, k);
     if(allprintable(res)) { // only printable ASCII
       if (score(res) > res.size() * 0.9) { // 90% in 'A-Za-z0-9 '
