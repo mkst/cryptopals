@@ -11,6 +11,7 @@ std::vector<uint8_t> xor_vector(const std::vector<uint8_t>& v1, const std::vecto
 std::vector<uint8_t> crackxor(const std::vector<uint8_t>& v);
 int guesskeylength(const std::vector<uint8_t>& s, int maxlength);
 std::vector<uint8_t> padme(const std::vector<uint8_t>& v, int length);
+std::vector<uint8_t> padzero(const std::vector<uint8_t> str, const int length);
 std::vector<uint8_t> initialiseiv(uint8_t length, bool randomise);
 
 bool ecbmatch(std::vector<uint8_t> v);
