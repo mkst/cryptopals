@@ -25,7 +25,7 @@ My attempt to solve the cryptopals challenges...
 17. [Y] The CBC padding oracle
 18. [Y] Implement CTR, the stream cipher mode
 19. [N] Break fixed-nonce CTR mode using substitutions
-20. [N] Break fixed-nonce CTR statistically
+20. [Y] Break fixed-nonce CTR statistically
 21. [N] Implement the MT19937 Mersenne Twister RNG
 22. [N] Crack an MT19937 seed
 23. [N] Clone an MT19937 RNG from its output

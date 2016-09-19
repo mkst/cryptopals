@@ -25,6 +25,8 @@ int main() {
   // set 3
   challenge_17();
   challenge_18();
+  // challenge_19(); TODO
+  challenge_20();
 
   return 0;
 }
