@@ -4,7 +4,7 @@ CFLAGS = -std=c++11 -Wall
 LIBS = -lcryptopp
 INCLUDES = -I./include
 
-SOURCES = src/main.cpp $(wildcard src/helpers/*.cpp) $(wildcard src/challenges/*.cpp)
+SOURCES = src/main.cpp $(wildcard src/classes/*.cpp) $(wildcard src/helpers/*.cpp) $(wildcard src/challenges/*.cpp)
 OUTPUT = ./bin
 
 

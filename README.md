@@ -26,7 +26,7 @@ My attempt to solve the cryptopals challenges...
 18. [Y] Implement CTR, the stream cipher mode
 19. [N] Break fixed-nonce CTR mode using substitutions
 20. [Y] Break fixed-nonce CTR statistically
-21. [N] Implement the MT19937 Mersenne Twister RNG
+21. [Y] Implement the MT19937 Mersenne Twister RNG
 22. [N] Crack an MT19937 seed
 23. [N] Clone an MT19937 RNG from its output
 24. [N] Create the MT19937 stream cipher and break it
