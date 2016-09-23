@@ -4,6 +4,7 @@
 #include <map>
 #include <random>
 #include <vector>
+#include <thread>
 
 std::string hex2str(const std::string& h) {
   std::string s;
@@ -248,4 +249,13 @@ const std::vector<std::string> explode(const std::string& s, const char& c) {
 
 std::vector<std::string> parsekv(const std::string& s, const char split){
   return explode(s, split);
+}
+
+void sleep(int seconds){
+  std::cout << "sleeping";
+  for(int i = 0; i < seconds; i++) {
+    std::cout << "." << std::flush;
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+  std::cout << std::endl;
 }

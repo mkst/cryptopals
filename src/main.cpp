@@ -28,6 +28,7 @@ int main() {
   // challenge_19(); TODO
   challenge_20();
   challenge_21();
+  challenge_22();
 
   return 0;
 }

@@ -21,3 +21,4 @@ void challenge_18();
 //void challenge_19(); // TODO
 void challenge_20();
 void challenge_21();
+void challenge_22();
