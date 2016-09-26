@@ -1,38 +1,38 @@
 # cryptopals
 My attempt to solve the cryptopals challenges...
 
-## Set 1: Basics
- - 01 [x] Convert hex to base64
- - 02 [x] Fixed XOR
- - 03 [x] Single-byte XOR cipher
- - 04 [x] Detect single-character XOR
- - 05 [x] Implement repeating-key XOR
- - 06 [x] Break repeating-key XOR
- - 07 [x] AES in ECB mode
- - 08 [x] Detect AES in ECB mode
+**Set 1: Basics**
+- [x] 01 Convert hex to base64
+- [x] 02 Fixed XOR
+- [x] 03 Single-byte XOR cipher
+- [x] 04 Detect single-character XOR
+- [x] 05 Implement repeating-key XOR
+- [x] 06 Break repeating-key XOR
+- [x] 07 AES in ECB mode
+- [x] 08 Detect AES in ECB mode
 
-## Set 2: Block crypto
- - 09 [x] Implement PKCS#7 padding
- - 10 [x] Implement CBC mode
- - 11 [x] An ECB/CBC detection oracle
- - 12 [x] Byte-at-a-time ECB decryption (Simple)
- - 13 [x] ECB cut-and-paste
- - 14 [ ] Byte-at-a-time ECB decryption (Harder)
- - 15 [x] PKCS#7 padding validation
- - 16 [x] CBC bitflipping attacks
+**Set 2: Block crypto**
+- [x] 09 Implement PKCS#7 padding
+- [x] 10 Implement CBC mode
+- [x] 11 An ECB/CBC detection oracle
+- [x] 12 Byte-at-a-time ECB decryption (Simple)
+- [x] 13 ECB cut-and-paste
+- [ ] 14 Byte-at-a-time ECB decryption (Harder)
+- [x] 15 PKCS#7 padding validation
+- [x] 16 CBC bitflipping attacks
 
-## Set 3: Block & stream crypto
- - 17 [x] The CBC padding oracle
- - 18 [x] Implement CTR, the stream cipher mode
- - 19 [ ] Break fixed-nonce CTR mode using substitutions
- - 20 [x] Break fixed-nonce CTR statistically
- - 21 [x] Implement the MT19937 Mersenne Twister RNG
- - 22 [x] Crack an MT19937 seed
- - 23 [ ] Clone an MT19937 RNG from its output
- - 24 [ ] Create the MT19937 stream cipher and break it
+**Set 3: Block & stream crypto**
+- [x] 17 The CBC padding oracle
+- [x] 18 Implement CTR, the stream cipher mode
+- [ ] 19 Break fixed-nonce CTR mode using substitutions
+- [x] 20 Break fixed-nonce CTR statistically
+- [x] 21 Implement the MT19937 Mersenne Twister RNG
+- [x] 22 Crack an MT19937 seed
+- [ ] 23 Clone an MT19937 RNG from its output
+- [ ] 24 Create the MT19937 stream cipher and break it
 
-## Extra info
-
+---
+**Extra info**
 Dependencies:
  - libcrypto++ (https://www.cryptopp.com/)
  - compiler with c++11 support
