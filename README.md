@@ -17,7 +17,7 @@ My attempt to solve the cryptopals challenges...
 - [x] 11 An ECB/CBC detection oracle
 - [x] 12 Byte-at-a-time ECB decryption (Simple)
 - [x] 13 ECB cut-and-paste
-- [ ] 14 Byte-at-a-time ECB decryption (Harder)
+- [x] 14 Byte-at-a-time ECB decryption (Harder)
 - [x] 15 PKCS#7 padding validation
 - [x] 16 CBC bitflipping attacks
 

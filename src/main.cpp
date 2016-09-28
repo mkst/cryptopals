@@ -18,7 +18,7 @@ int main() {
   challenge_11();
   challenge_12();
   challenge_13();
-  // challenge_14(); TODO
+  challenge_14();
   challenge_15();
   challenge_16();
 
