@@ -24,3 +24,5 @@ std::string encodev(const std::vector<std::string> v, const char join);
 std::string v2hex(const std::vector<uint8_t>& v);
 std::vector<uint8_t> hex2v(const std::vector<uint8_t>& h);
 std::string v2str(const std::vector<uint8_t>& v);
+
+void sleep(int seconds);
