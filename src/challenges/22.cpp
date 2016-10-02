@@ -14,7 +14,7 @@ void challenge_22() {
 
   // get seed from 'now'
   std::chrono::system_clock::time_point n = std::chrono::system_clock::now();
-  int seed = std::chrono::duration_cast<std::chrono::milliseconds>(n.time_since_epoch()).count();
+  uint64_t seed = std::chrono::duration_cast<std::chrono::milliseconds>(n.time_since_epoch()).count();
   Mersenne r2(seed);
 
   // sleep after seed generated
@@ -26,7 +26,7 @@ void challenge_22() {
 
   // now bruteforce crack from 'now'
   n = std::chrono::system_clock::now();
-  int now = std::chrono::duration_cast<std::chrono::milliseconds>(n.time_since_epoch()).count();
+  uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(n.time_since_epoch()).count();
 
   while(true) {
     Mersenne g(now);
