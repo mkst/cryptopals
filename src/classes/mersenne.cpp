@@ -18,7 +18,7 @@ uint32_t Mersenne::extract_number(){
 
   uint64_t y = MT[index];
 
-  y = y ^ (y >> u);
+  y = y ^ ((y >> u) & d);
   y = y ^ ((y << s) & b);
   y = y ^ ((y << t) & c);
   y = y ^ (y >> l);
